@@ -2,7 +2,6 @@ package com.aaa.controller;
 
 import com.aaa.config.UserCredentialsMatcher;
 import com.aaa.entity.DataGridView;
-import com.aaa.entity.Role;
 import com.aaa.entity.User;
 import com.aaa.entity.UserRole;
 import com.aaa.service.MenuService;
@@ -11,7 +10,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +26,10 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+
     @RequestMapping("selectAllUser")
     @ResponseBody
-    public Object selectAllUser(Integer page,Integer limit,User user){
+    public Object selectAllUser(Integer page, Integer limit, User user) {
         PageHelper.startPage(page, limit);
         List<User> allUser = userService.selectAllUser(user);
         PageInfo pageInfo = new PageInfo(allUser);
@@ -45,53 +44,50 @@ public class UserController {
 
         return tableData;
     }
+
     /*
-    * 修改用户
-    * */
+     * 修改用户
+     * */
     @RequestMapping("updateUser")
     @ResponseBody
-    public Object updateUser(User user){
-        int i1 = userService.checkUser(user);
-        if(i1==1) {
-            return "当前登陆名已存在";
-        }else{
-            int i = userService.updateUser(user);
-            if(i>0){
-                return "修改成功";
-            }else{
-                return "修改失败";
-            }
+    public Object updateUser(User user) {
+        int i = userService.updateUser(user);
+        if (i > 0) {
+            return "修改成功";
+        } else {
+            return "修改失败";
         }
-
-
     }
+
     /*
      * 删除用户
      * */
     @RequestMapping("deleteUser")
     @ResponseBody
-    public Object deleteUser(Integer userid){
+    public Object deleteUser(Integer userid) {
         userService.deleteUser(userid);
-       return "删除成功";
+        return "删除成功";
     }
+
     /*
      * 初始化用户分配角色
      * */
     @RequestMapping("initUserRole")
     @ResponseBody
-    public DataGridView initUserRole(Integer userid){
+    public DataGridView initUserRole(Integer userid) {
         return userService.queryUserRole(userid);
     }
+
     /*
      * 添加用户
      * */
     @RequestMapping("addUser")
     @ResponseBody
-    public Object addUser(User user){
+    public Object addUser(User user) {
         int i1 = userService.checkUser(user);
-        if(i1==1){
+        if (i1 == 1) {
             return "当前登陆名已存在";
-        }else {
+        } else {
             //加盐
             String salt = UserCredentialsMatcher.generateSalt(6);
             //MD5加密迭代两次
@@ -107,12 +103,13 @@ public class UserController {
             }
         }
     }
+
     /*
      * 重置密码
      * */
     @RequestMapping("resetUserPwd")
     @ResponseBody
-    public Object resetUserPwd(User user,Integer userid){
+    public Object resetUserPwd(User user, Integer userid) {
         user.setUserid(userid);
         //加盐
         String salt = UserCredentialsMatcher.generateSalt(6);
@@ -124,33 +121,37 @@ public class UserController {
         return "重置成功";
 
     }
+
     /*
      * 保存用户和角色的关系
      * */
     @RequestMapping("saveUserRole")
     @ResponseBody
-    public Object saveUserRole(UserRole userRole){
+    public Object saveUserRole(UserRole userRole) {
         userService.saveUserRole(userRole);
         return "分配成功";
     }    /*
      * 修改资料
      * */
+
     @RequestMapping("editLogin")
     @ResponseBody
-    public Object editLogin(User user){
+    public Object editLogin(User user) {
         int i = userService.editLogin(user);
-        if(i==1){
+        if (i == 1) {
             return "修改成功";
-        }else{
+        } else {
             return "修改失败";
         }
 
     }
+
     @Autowired
     private MenuService menuService;
+
     @RequestMapping("editPwd")
     @ResponseBody
-    public Object editPwd(User user,String loginname,String pwd,String pwd1){
+    public Object editPwd(User user, String loginname, String pwd, String pwd1) {
         //第一步：建立subject
         Subject subject = SecurityUtils.getSubject();
         //第二步：封装token  凭证
